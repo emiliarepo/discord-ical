@@ -2,19 +2,20 @@ const crypto = require('crypto')
 
 const eventFetcher = (guild) => {
     const events = []
-    Array.from(guild.scheduledEvents.cache.values()).forEach(event => {
-        if (event.entityType == "EXTERNAL") events.push({
-            name: getOrNone(event.name),
-            description: getOrNone(event.description),
-            location: getOrNone(event.entityMetadata.location),
-            start: generateTimezoneString(event.scheduledStartAt),
-            end: generateTimezoneString(event.scheduledEndAt),
-            created: generateTimezoneString(event.createdAt),
-            uid: crypto.randomUUID()
+    return guild.scheduledEvents.fetch().then(discordEvents => {
+        Array.from(discordEvents.values()).forEach(event => {
+            if (event.entityType == "EXTERNAL") events.push({
+                name: getOrNone(event.name),
+                description: getOrNone(event.description),
+                location: getOrNone(event.entityMetadata.location),
+                start: generateTimezoneString(event.scheduledStartAt),
+                end: generateTimezoneString(event.scheduledEndAt),
+                created: generateTimezoneString(event.createdAt),
+                uid: crypto.randomUUID()
+            })
         })
-
+        return events
     })
-    return events
 }
 
 const generateTimezoneString = (date) => {

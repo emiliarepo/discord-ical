@@ -18,8 +18,9 @@ const port = 3042
 app.get('/cal/:guildID', (req, res) => {
   const guild = client.guilds.cache.get(req.params.guildID)
   if (guild) {
-    res.set({"Content-Disposition":"attachment; filename=\"" + guild.name + ".ics\""});
-    res.send(generateCal(fetchEvents(guild), guild.name))
+    fetchEvents(guild).then(events => {
+      res.send(generateCal(events, guild.name))
+    })
   } else {
     res.status(404).send("guild not found")
   }
